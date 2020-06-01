@@ -238,7 +238,7 @@ def check_dir_entries():
     for dir_entry in dir_entries:
         if dir_entry.name == '\'.\'' and dir_entry.inode != dir_entry.parent_inode_num:
             print_self_invalid(dir_entry.parent_inode_num, dir_entry.inode)
-        if dir_entry.name == '\'..\'' and dir_entry.inode != parent[dir_entry.inode_num]:
+        if dir_entry.name == '\'..\'' and dir_entry.inode != parent[dir_entry.inode]:
             print_parent_invalid(dir_entry.parent_inode_num, dir_entry.inode, parent[dir_entry.parent_inode_num])
     
 
