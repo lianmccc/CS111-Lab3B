@@ -2,7 +2,7 @@
 #EMAIL: lianmccc@ucla.edu, seoyoonjin@g.ucla.edu
 #ID: 005348062, 505297593
 
-default: 
+default: lab3b
 	chmod u+x lab3b
 
 clean:

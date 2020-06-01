@@ -105,9 +105,6 @@ def convert_block_level(block_level):
 def check_blocks():
     # Examine every single block pointer in every single I-node, direct block, indirect block, double-indirect block, and triple indirect block
     
-    def block_offset(block_num):
-        return 1024 + (block_num - 1) * superblock.block_size
-
     def block_invalid(block_num):
         # return true if block number is invalid, else return false
         return block_num < 0 or block_num > superblock.s_blocks_count
