@@ -216,8 +216,8 @@ def print_parent_invalid(parent_inode_num, inode, parent):
     print('DIRECTORY INODE {} NAME \'.\' LINK TO INODE {} SHOULD BE {}'.format(parent_inode_num, inode, parent))
 
 def check_dir_entries():
-    parent = []     # index is inode number, value is its parent inode number
-    linkcount = []  # index is inode number, value is its linkcount
+    parent = [0] * superblock.s_inodes_count    # index is inode number, value is its parent inode number
+    linkcount = [0] * superblock.s_inodes_count # index is inode number, value is its linkcount
 
     # check if dir_entry's inode is unallocated or invalid, and count links
     for dir_entry in dir_entries:
