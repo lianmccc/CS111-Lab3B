@@ -200,10 +200,30 @@ def print_unallocated_inode(inode_num):
     print('UNALLOCATED INODE {} NOT ON FREELIST'.format(inode_num))
 
 def check_inodes():
-    # TODO: check inodes
+    print('# TODO: check inodes')
+    
 
 #---------------------------------Directory Consistency Audits---------------------------------
-# TODO: do Directory Consistency Audits
+ 
+# Incorrect link count (# of entries pointing to inode does not match inode link count)
+def print_invalid_linkcount(inode_num, i_links_count, number_discovered):
+    print('INODE {} HAS {} LINKS BUT LINKCOUNT IS {}'.format(inode_num, i_links_count, number_discovered))
+
+# Unallocated (i_node referenced in entry is marked as free on bitmap)
+def print_unallocated_dir_inode(parent_inode_num, name, inode):
+    print('DIRECTORY INODE {} NAME \'{}\' INVALID INODE {}'.format(parent_inode_num, name, inode))
+
+# Invalid (i_node # referenced in entry is invalid)
+def print_invalid_dir_inode(parent_inode_num, name, inode):
+    print('DIRECTORY INODE {} NAME \'{}\' UNALLOCATED INODE {}'.format(parent_inode_num, name, inode))
+
+# . is not self
+def print_self_invalid(parent_inode_num, inode):
+    print('DIRECTORY INODE {} NAME \'..\' LINK TO INODE {} SHOULD BE {}'.format(parent_inode_num, inode, parent_inode_num))
+
+# .. is not parent
+def print_parent_invalid(parent_inode_num, inode):
+    print('DIRECTORY INODE {} NAME \'.\' LINK TO INODE {} SHOULD BE {}'.format(parent_inode_num, inode, inode))
     
 
 
