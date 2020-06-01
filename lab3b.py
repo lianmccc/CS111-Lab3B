@@ -291,4 +291,4 @@ if __name__ == '__main__':
             sys.exit(1)
     
     check_blocks()
-    
+    check_dir_entries()
