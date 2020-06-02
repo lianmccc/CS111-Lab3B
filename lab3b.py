@@ -111,12 +111,8 @@ def check_blocks():
     
     def block_reserved(block_num):
         # return true if block number is reserved, else return false 
-        first_legal_block_number = 5 + int(superblock.s_inodes_count * superblock.s_inode_size / superblock.block_size)
+        first_legal_block_number = group.bg_inode_table + int(superblock.s_inodes_count * superblock.s_inode_size / superblock.block_size)
         return block_num < first_legal_block_number
-            # block_num == group.bg_block_bitmap or \
-            # block_num == group.bg_inode_bitmap or \
-            # block_num == group.bg_inode_table or \
-            
 
     def check_block(block_num, block_level, inode_num, offset):
         if block_num == 0: # no need to do anything if block_num is 0 
@@ -141,18 +137,22 @@ def check_blocks():
         if block_reserved(block_num):
             print_reserved_block(block_num, block_level, inode_num, offset)
         
-
+    allocated_inodes = set()    # set of allocated inode numbers
     referenced = {}             # dictionary of referenced blocks. key: block number. value: touple of (block_level, inode number, offset)
     duplicates = set()          # set of duplicates. touples of (block_num, block_level, inode number, offset)
 
     num_blocks = int(superblock.block_size / 4) # number of block numbers in a block - used for calculating offset
     
     for inode in inodes:
+        if inode.inode_num in ifree:
+            print_allocated_inode(inode.inode_num)
+        else:
+            allocated_inodes.add(inode.inode_num)
+
         for idx, block_num in enumerate(inode.direct_blocks_num):
             offset = idx
             check_block(block_num, 0, inode.inode_num,  offset)
             
-        
         if inode.has_ind():
             offset = 12
             check_block(inode.ind_block_num, 1, inode.inode_num, offset)
@@ -170,7 +170,7 @@ def check_blocks():
         offset = indirect.logical_offset
         check_block(block_num, block_level, inode_num, offset)
 
-    # print duplicates
+    # print duplicates block
     for duplicate in duplicates: 
         block_num, block_level, inode_num, offset = duplicate
         print_duplicate_block(block_num, block_level, inode_num, offset)
@@ -180,14 +180,18 @@ def check_blocks():
         if block_num not in referenced and block_num not in bfree and not block_reserved(block_num):
             unreferenced.add(block_num)
     
-    # print unreferenced
+    # print unreferenced block
     for block_num in unreferenced:
         print_unreferenced_block(block_num)
     
-    # print allocated
+    # print allocated block
     for free_block_num in bfree:
         if free_block_num in referenced:
             print_allocated_block(free_block_num)
+
+    for inode_num in range(11, superblock.s_inodes_count + 1): # inode numbers from 1 to 10 are reserved
+        if inode_num not in ifree and inode_num not in allocated_inodes:
+            print_unallocated_inode(inode_num)
 
 
 #---------------------------------Directory Consistency Audits---------------------------------
@@ -227,7 +231,7 @@ def check_dir_entries():
         elif dir_entry.inode in ifree:
             print_unallocated_dir_inode(dir_entry.parent_inode_num, dir_entry.name, dir_entry.inode)
         else:
-            linkcount[dir_entry.inode] += 1
+            linkcount[dir_entry.inode] += 1 
     
     # check if links matches links_count
     for inode in inodes:
@@ -250,8 +254,7 @@ def print_allocated_inode(inode_num):
 def print_unallocated_inode(inode_num):
     print('UNALLOCATED INODE {} NOT ON FREELIST'.format(inode_num))
 
-def check_inodes():
-    print('# TODO: check inodes')
+# checking inodes done in block consistency audit
 
 
 
