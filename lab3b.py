@@ -119,7 +119,6 @@ def check_blocks():
             return
 
         block_level = convert_block_level(block_level)
-        # TODO: offset calculation
 
         if block_num in referenced:
             ref_info = referenced[block_num]
@@ -202,11 +201,11 @@ def print_invalid_linkcount(inode_num, number_discovered, i_links_count):
 
 # Unallocated (i_node referenced in entry is marked as free on bitmap)
 def print_unallocated_dir_inode(parent_inode_num, name, inode):
-    print('DIRECTORY INODE {} NAME \'{}\' INVALID INODE {}'.format(parent_inode_num, name, inode))
+    print('DIRECTORY INODE {} NAME \'{}\' UNALLOCATED INODE {}'.format(parent_inode_num, name, inode))
 
 # Invalid (i_node # referenced in entry is invalid)
 def print_invalid_dir_inode(parent_inode_num, name, inode):
-    print('DIRECTORY INODE {} NAME \'{}\' UNALLOCATED INODE {}'.format(parent_inode_num, name, inode))
+    print('DIRECTORY INODE {} NAME \'{}\' INVALID INODE {}'.format(parent_inode_num, name, inode))
 
 # . is not self
 def print_self_invalid(parent_inode_num, inode):
@@ -218,7 +217,7 @@ def print_parent_invalid(parent_inode_num, inode, parent):
 
 def check_dir_entries():
     parent = [0] * superblock.s_inodes_count    # index is inode number, value is its parent inode number
-    linkcount = [0] * superblock.s_inodes_count # index is inode number, value is its linkcount
+    linkcount = {}  # index is inode number, value is its linkcount
 
     # check if dir_entry's inode is unallocated or invalid, and count links
     for dir_entry in dir_entries:
@@ -230,12 +229,16 @@ def check_dir_entries():
             print_invalid_dir_inode(dir_entry.parent_inode_num, dir_entry.name, dir_entry.inode)
         elif dir_entry.inode in ifree:
             print_unallocated_dir_inode(dir_entry.parent_inode_num, dir_entry.name, dir_entry.inode)
-        else:
-            linkcount[dir_entry.inode] += 1 
+        
+        if dir_entry.inode not in linkcount:
+            linkcount[dir_entry.inode] = 0
+        linkcount[dir_entry.inode] += 1 
     
     # check if links matches links_count
     for inode in inodes:
-        if linkcount[inode.inode_num] != inode.i_links_count:
+        if inode.inode_num not in linkcount:
+            print_invalid_linkcount(inode.inode_num, 0, inode.i_links_count)
+        elif linkcount[inode.inode_num] != inode.i_links_count:
             print_invalid_linkcount(inode.inode_num, linkcount[inode.inode_num], inode.i_links_count)
     
     # check if self and parent are pointing correctly
@@ -255,8 +258,6 @@ def print_unallocated_inode(inode_num):
     print('UNALLOCATED INODE {} NOT ON FREELIST'.format(inode_num))
 
 # checking inodes done in block consistency audit
-
-
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
