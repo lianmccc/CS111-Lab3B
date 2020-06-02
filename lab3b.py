@@ -202,11 +202,11 @@ def print_invalid_linkcount(inode_num, number_discovered, i_links_count):
 
 # Unallocated (i_node referenced in entry is marked as free on bitmap)
 def print_unallocated_dir_inode(parent_inode_num, name, inode):
-    print('DIRECTORY INODE {} NAME \'{}\' UNALLOCATED INODE {}'.format(parent_inode_num, name, inode))
+    print('DIRECTORY INODE {} NAME {} UNALLOCATED INODE {}'.format(parent_inode_num, name, inode))
 
 # Invalid (i_node # referenced in entry is invalid)
 def print_invalid_dir_inode(parent_inode_num, name, inode):
-    print('DIRECTORY INODE {} NAME \'{}\' INVALID INODE {}'.format(parent_inode_num, name, inode))
+    print('DIRECTORY INODE {} NAME {} INVALID INODE {}'.format(parent_inode_num, name, inode))
 
 # . is not self
 def print_self_invalid(parent_inode_num, inode):
