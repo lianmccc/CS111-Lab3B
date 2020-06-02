@@ -3,6 +3,7 @@
 #ID: 005348062, 505297593
 
 default: runlab3b.sh lab3b.py
+	rm -f lab3b
 	ln runlab3b.sh lab3b
 	chmod u+x lab3b
 
