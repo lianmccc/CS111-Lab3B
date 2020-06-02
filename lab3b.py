@@ -9,6 +9,7 @@ ifree = [] # list of free inode  numbers
 inodes = [] # list of inodes
 dir_entries = [] # list of dir entries
 indirect_blocks = [] # list of indirect blocks
+allocated_inodes = set()    # set of allocated inode numbers
 
 class SuperBlock:
     def __init__(self,line):
@@ -136,7 +137,7 @@ def check_blocks():
         if block_reserved(block_num):
             print_reserved_block(block_num, block_level, inode_num, offset)
         
-    allocated_inodes = set()    # set of allocated inode numbers
+   
     referenced = {}             # dictionary of referenced blocks. key: block number. value: touple of (block_level, inode number, offset)
     duplicates = set()          # set of duplicates. touples of (block_num, block_level, inode number, offset)
 
@@ -145,8 +146,8 @@ def check_blocks():
     for inode in inodes:
         if inode.inode_num in ifree:
             print_allocated_inode(inode.inode_num)
-        else:
-            allocated_inodes.add(inode.inode_num)
+            
+        allocated_inodes.add(inode.inode_num)
 
         for idx, block_num in enumerate(inode.direct_blocks_num):
             offset = idx
@@ -227,7 +228,7 @@ def check_dir_entries():
 
         if dir_entry.inode > superblock.s_inodes_count  or dir_entry.inode < 1:
             print_invalid_dir_inode(dir_entry.parent_inode_num, dir_entry.name, dir_entry.inode)
-        elif dir_entry.inode in ifree:
+        elif dir_entry.inode not in allocated_inodes:
             print_unallocated_dir_inode(dir_entry.parent_inode_num, dir_entry.name, dir_entry.inode)
         
         if dir_entry.inode not in linkcount:
