@@ -189,7 +189,7 @@ def check_blocks():
         if free_block_num in referenced:
             print_allocated_block(free_block_num)
 
-    for inode_num in range(11, superblock.s_inodes_count + 1): # inode numbers from 1 to 10 are reserved
+    for inode_num in range(superblock.s_first_ino, superblock.s_inodes_count + 1): # inode numbers from 1 to 10 are reserved
         if inode_num not in ifree and inode_num not in allocated_inodes:
             print_unallocated_inode(inode_num)
 
@@ -218,7 +218,6 @@ def print_parent_invalid(parent_inode_num, inode, parent):
 
 def check_dir_entries():
     parent = [0] * superblock.s_inodes_count    # index is inode number, value is its parent inode number
-    parent[2] = 2
     linkcount = {}  # index is inode number, value is its linkcount
 
     # check if dir_entry's inode is unallocated or invalid, and count links
