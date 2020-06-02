@@ -11,6 +11,8 @@ dir_entries = [] # list of dir entries
 indirect_blocks = [] # list of indirect blocks
 allocated_inodes = set()    # set of allocated inode numbers
 
+inconsistency_found = False
+
 class SuperBlock:
     def __init__(self,line):
         self.s_blocks_count = int(line[1])      # total number of blocks 
@@ -79,18 +81,23 @@ class Indirect:
 
 #---------------------------------Block Consistency Audits---------------------------------
 def print_invalid_block(block_num, block_level, inode_num, offset):
+    inconsistency_found = True
     print('INVALID {} {} IN INODE {} AT OFFSET {}'.format(block_level, block_num, inode_num, offset))
 
 def print_reserved_block(block_num, block_level, inode_num, offset):
+    inconsistency_found = True
     print('RESERVED {} {} IN INODE {} AT OFFSET {}'.format(block_level, block_num, inode_num, offset))
 
 def print_duplicate_block(block_num, block_level, inode_num, offset):
+    inconsistency_found = True
     print('DUPLICATE {} {} IN INODE {} AT OFFSET {}'.format(block_level, block_num, inode_num, offset))
 
 def print_unreferenced_block(block_num):
+    inconsistency_found = True
     print('UNREFERENCED BLOCK {}'.format(block_num))
 
 def print_allocated_block(block_num):
+    inconsistency_found = True
     print('ALLOCATED BLOCK {} ON FREELIST'.format(block_num))
 
 def convert_block_level(block_level):
@@ -197,22 +204,27 @@ def check_blocks():
  
 # Incorrect link count (# of entries pointing to inode does not match inode link count)
 def print_invalid_linkcount(inode_num, number_discovered, i_links_count):
+    inconsistency_found = True
     print('INODE {} HAS {} LINKS BUT LINKCOUNT IS {}'.format(inode_num, number_discovered, i_links_count))
 
 # Unallocated (i_node referenced in entry is marked as free on bitmap)
 def print_unallocated_dir_inode(parent_inode_num, name, inode):
+    inconsistency_found = True
     print('DIRECTORY INODE {} NAME {} UNALLOCATED INODE {}'.format(parent_inode_num, name, inode))
 
 # Invalid (i_node # referenced in entry is invalid)
 def print_invalid_dir_inode(parent_inode_num, name, inode):
+    inconsistency_found = True
     print('DIRECTORY INODE {} NAME {} INVALID INODE {}'.format(parent_inode_num, name, inode))
 
 # . is not self
 def print_self_invalid(parent_inode_num, inode):
+    inconsistency_found = True
     print('DIRECTORY INODE {} NAME \'.\' LINK TO INODE {} SHOULD BE {}'.format(parent_inode_num, inode, parent_inode_num))
 
 # .. is not parent
 def print_parent_invalid(parent_inode_num, inode, parent):
+    inconsistency_found = True
     print('DIRECTORY INODE {} NAME \'..\' LINK TO INODE {} SHOULD BE {}'.format(parent_inode_num, inode, parent))
 
 def check_dir_entries():
@@ -253,9 +265,11 @@ def check_dir_entries():
 
 #---------------------------------Inode Consistency Audits---------------------------------
 def print_allocated_inode(inode_num):
+    inconsistency_found = True
     print('ALLOCATED INODE {} ON FREELIST'.format(inode_num))
 
 def print_unallocated_inode(inode_num):
+    inconsistency_found = True
     print('UNALLOCATED INODE {} NOT ON FREELIST'.format(inode_num))
 
 # checking inodes done in block consistency audit
@@ -293,3 +307,8 @@ if __name__ == '__main__':
     
     check_blocks()
     check_dir_entries()
+
+    if inconsistency_found: 
+        sys.exit(2)
+    else:
+        sys.exit(0)
