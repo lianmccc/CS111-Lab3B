@@ -218,6 +218,7 @@ def print_parent_invalid(parent_inode_num, inode, parent):
 
 def check_dir_entries():
     parent = [0] * superblock.s_inodes_count    # index is inode number, value is its parent inode number
+    parent[2] = 2
     linkcount = {}  # index is inode number, value is its linkcount
 
     # check if dir_entry's inode is unallocated or invalid, and count links
