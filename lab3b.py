@@ -210,11 +210,11 @@ def print_invalid_dir_inode(parent_inode_num, name, inode):
 
 # . is not self
 def print_self_invalid(parent_inode_num, inode):
-    print('DIRECTORY INODE {} NAME \'..\' LINK TO INODE {} SHOULD BE {}'.format(parent_inode_num, inode, parent_inode_num))
+    print('DIRECTORY INODE {} NAME \'.\' LINK TO INODE {} SHOULD BE {}'.format(parent_inode_num, inode, parent_inode_num))
 
 # .. is not parent
 def print_parent_invalid(parent_inode_num, inode, parent):
-    print('DIRECTORY INODE {} NAME \'.\' LINK TO INODE {} SHOULD BE {}'.format(parent_inode_num, inode, parent))
+    print('DIRECTORY INODE {} NAME \'..\' LINK TO INODE {} SHOULD BE {}'.format(parent_inode_num, inode, parent))
 
 def check_dir_entries():
     parent = [0] * superblock.s_inodes_count    # index is inode number, value is its parent inode number
@@ -242,7 +242,7 @@ def check_dir_entries():
     for dir_entry in dir_entries:
         if dir_entry.name == '\'.\'' and dir_entry.inode != dir_entry.parent_inode_num:
             print_self_invalid(dir_entry.parent_inode_num, dir_entry.inode)
-        if dir_entry.name == '\'..\'' and dir_entry.inode != parent[dir_entry.inode]:
+        if dir_entry.name == '\'..\'' and dir_entry.inode != parent[dir_entry.parent_inode_num]:
             print_parent_invalid(dir_entry.parent_inode_num, dir_entry.inode, parent[dir_entry.parent_inode_num])
     
 
@@ -285,7 +285,6 @@ if __name__ == '__main__':
             dir_entries.append(DirEnt(line))
         elif line[0] == "INDIRECT":
             indirect_blocks.append(Indirect(line))
-
         else:
             sys.stderr.write("invalid csv file\n")
             sys.exit(1)
