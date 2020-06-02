@@ -137,6 +137,7 @@ def check_blocks():
         if block_reserved(block_num):
             print_reserved_block(block_num, block_level, inode_num, offset)
         
+   
     referenced = {}             # dictionary of referenced blocks. key: block number. value: touple of (block_level, inode number, offset)
     duplicates = set()          # set of duplicates. touples of (block_num, block_level, inode number, offset)
 
